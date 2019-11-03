@@ -1,0 +1,4 @@
+cpu_number:4
+fd_number:1024
+internal_memory:4096
+
