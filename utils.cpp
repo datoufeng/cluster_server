@@ -17,7 +17,7 @@ base_message* channel::internel_handle(base_message& input_msg){
 	return input_msg;
 }
 
-base_handle* get_next_handle(base_message& input_msg){
+base_handle* channel::get_next_handle(base_message& input_msg){
 	if(input_msg.type!=web||input_msg.type!=client||input_msg.type!=other_type)
 		return NULL;
 	if(input_msg.io_data==in){

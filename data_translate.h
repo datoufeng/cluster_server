@@ -10,11 +10,7 @@ struct base_message{
     base_message(IO_DATA io){
         io_data=io;
 	}
-    virtual ~base_message(){
-		// close(epfd);
-	}
-	
-    // enum TYPE{web,client,other_type}type;
+    virtual ~base_message(){}
 	IO_DATA io_data;
 	// char type[8];
     // char length[8];
@@ -74,15 +70,12 @@ public:
 	channel* f_channel;
 	dealer* f_dealer;
 protected:
-
     virtual base_message* raw_to_struct(base_message & msg)=0;
     virtual base_message* struct_to_raw(base_message& msg)=0;
     
 private:
-	
     // virtual base_handle* get_next_role();
     // virtual base_handle* get_next_channel();
-
     virtual base_message* internel_handle(base_message& input_msg);
     virtual base_handle* get_next_handle(base_message& input_msg);
 
@@ -91,6 +84,7 @@ private:
 class dealer:base_handle{
     private:
 	protocol* f_protocol;
+    
     public:
     dealer(){}
     virtual ~dealer(){}
