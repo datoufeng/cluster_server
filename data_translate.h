@@ -1,26 +1,25 @@
 #include<iostream>
 #include<string>
 #include<list>
-#include<sys/epoll.h>
 #include "thread_pool/thread_pool.h"
 #include "memory_pool/memory_pool.h"
-using namespace std;
 
+using namespace std;
+enum IO_DATA{in,out};
 struct base_message{
-    base_message(){
-		if(epfd!=-1){
-			epfd=epoll_create(1);
-		}
+    base_message(IO_DATA io){
+        io_data=io;
 	}
     virtual ~base_message(){
 		// close(epfd);
 	}
-	static int epfd=-1;
+	
     // enum TYPE{web,client,other_type}type;
-	enum IO_DATA{in,out}io_data;
+	IO_DATA io_data;
 	// char type[8];
     // char length[8];
     string value;
+    void* ptr;
 };
 
 class base_handle{
@@ -47,7 +46,7 @@ public:
     virtual bool read_fd(string& data)=0;
     virtual bool write_fd(string& data)=0;
     virtual void fini()=0;
-    // string& convert_to_printable(memory_pool& data);
+
     bool get_close_statement(){
         return need_close;
     }
@@ -60,8 +59,6 @@ public:
     bool if_empty(){
         return true==data_buf.empty();
     }
-	// base_message* type_self_deal()=0;
-
 protected:
     virtual base_message* get_next_stage(base_message& msg)=0;
 
@@ -106,9 +103,10 @@ class dealer:base_handle{
 
 class FEN_DEAL{
     private:
-    FEN_DEAL(){
-        // l_feng=new Feng_Deal;
-    }
+    FEN_DEAL(){ }
+    ~FEN_DEAL(){ }
+
+    static int epfd=-1;
     static FEN_DEAL* l_feng;
     list<channel*> l_channel;
     list<protocol*> l_protocol;
