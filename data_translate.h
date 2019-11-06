@@ -12,8 +12,6 @@ struct base_message{
 	}
     virtual ~base_message(){}
 	IO_DATA io_data;
-	// char type[8];
-    // char length[8];
     string value;
     void* ptr;
 };
@@ -55,6 +53,10 @@ public:
     bool if_empty(){
         return true==data_buf.empty();
     }
+    virtual bind_protocol(protocol* i_protocol){
+        this->f_protocol=i_protocol;
+    }
+
 protected:
     virtual base_message* get_next_stage(base_message& msg)=0;
 
@@ -69,13 +71,18 @@ public:
     virtual ~protocol(){}
 	channel* f_channel;
 	dealer* f_dealer;
+
 protected:
     virtual base_message* raw_to_struct(base_message & msg)=0;
     virtual base_message* struct_to_raw(base_message& msg)=0;
     
-private:
-    // virtual base_handle* get_next_role();
-    // virtual base_handle* get_next_channel();
+public:
+    virtual bind_channel(channel* i_channel){
+        this->f_channel=i_channel;
+    }
+    virtual bind_dealer(dealer* i_dealer){
+        this->f_dealer=i_dealer;
+    }
     virtual base_message* internel_handle(base_message& input_msg);
     virtual base_handle* get_next_handle(base_message& input_msg);
 
@@ -88,6 +95,11 @@ class dealer:base_handle{
     public:
     dealer(){}
     virtual ~dealer(){}
+    virtual void init()=0;
+    virtual void fini()=0;
+    virtual void bind_protocol(protocol* i_protocol){
+        this->f_protocol=i_protocol;
+    }
     virtual base_message* msg_handle(base_message& msg);
 
     protected:
@@ -97,9 +109,13 @@ class dealer:base_handle{
 
 class FEN_DEAL{
     private:
-    FEN_DEAL(){ }
-    ~FEN_DEAL(){ }
-
+    FEN_DEAL(){
+        epfd=epoll_create(1);
+    }
+    ~FEN_DEAL(){
+        close(epfd);
+    }
+    
     static int epfd=-1;
     static FEN_DEAL* l_feng;
     list<channel*> l_channel;
@@ -116,12 +132,15 @@ class FEN_DEAL{
 	void run();
 	
     public:
+
     static void FEN_ADD_PROTOCOL(protocol* pro);
     static void FEN_ADD_CHANNEL(channel* cha);
     static void FEN_ADD_DEALER(dealer* del);
     static void FEN_DEL_PROTOCOL(protocol*pro);
     static void FEN_DEL_CHANNEL(channel* cha);
     static void FEN_DEL_DEALER(dealer*del);
+    static void FEN_INIT();
+    static void FEN_FINI();
 
     static void FEN_RUN();
 
