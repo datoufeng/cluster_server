@@ -7,8 +7,9 @@
 using namespace std;
 enum IO_DATA{in,out};
 struct base_message{
+    base_message(){}
     base_message(IO_DATA io){
-        io_data=io;
+        this->io_data=io;
 	}
     virtual ~base_message(){}
 	IO_DATA io_data;
@@ -27,7 +28,8 @@ class base_handle{
 };
 
 class channel:public base_handle{
-private:
+public:
+    // string where_data;
     list<string> data_buf;
     int data_fd=-1;
     bool need_close=false;
@@ -53,12 +55,12 @@ public:
     bool if_empty(){
         return true==data_buf.empty();
     }
-    virtual bind_protocol(protocol* i_protocol){
+    void bind_protocol(protocol* i_protocol){
         this->f_protocol=i_protocol;
     }
 
 protected:
-    virtual base_message* get_next_stage(base_message& msg)=0;
+    virtual base_message* message_handle(base_message& msg)=0;
 
 private:
     virtual base_message* internel_handle(base_message& input_msg);
