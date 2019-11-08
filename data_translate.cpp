@@ -68,8 +68,6 @@ void FEN_DEAL::run(){
 					throw;
 			}
 		}
-
 	}
-
 }
 
