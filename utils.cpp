@@ -13,7 +13,7 @@ base_message* channel::internel_handle(base_message& input_msg){
 	// this->get_next_stage(input_msg);
 	string tmp;
 	read_fd(tmp);
-	input_msg=this->get_next_stage(tmp);
+	input_msg=this->message_handle(tmp);
 	return input_msg;
 }
 
@@ -35,7 +35,7 @@ base_message* protocol::internel_handle(base_message& input_msg){
 	if(input_msg.io_data==in){
 		return this->raw_to_struct(input_msg);
 	}
-	else{
+	else if(input_msg.io_data==out){
 		return this->struct_to_raw(input_msg);
 	}
 }
